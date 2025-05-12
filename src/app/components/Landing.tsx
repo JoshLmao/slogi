@@ -8,7 +8,6 @@ import {
     Textarea,
     Group,
     FileButton,
-    Container,
 } from "@mantine/core";
 import { GitHub, Terminal } from "react-feather";
 
