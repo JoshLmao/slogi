@@ -8,7 +8,9 @@ import {
     Textarea,
     Group,
     FileButton,
+    Container,
 } from "@mantine/core";
+import { GitHub, Terminal } from "react-feather";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -30,6 +32,26 @@ export default function Landing() {
 
     return (
         <div className="min-h-screen flex flex-col">
+            {/* Thin heading strip */}
+            <div className="bg-gray-100">
+                <div className=" p-2 flex justify-between items-center gap-4 mx-auto max-w-screen-lg">
+                    <a href="https://joshlmao.com" target="_blank">
+                        <Group gap={1}>
+                            <Terminal color="darkred" />
+                            by joshlmao
+                        </Group>
+                    </a>
+                    <a
+                        href="https://github.com/joshlmao/slogi"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <GitHub color="black" />
+                    </a>
+                    {/* Add more links/images as needed */}
+                </div>
+            </div>
+
             <header className="text-center p-4 flex-none">
                 <Title order={1} className="text-4xl sm:text-5xl">
                     Slogi
