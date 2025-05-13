@@ -50,7 +50,10 @@ export default function Landing() {
             }
         });
 
-        return categories;
+        // Sort categories alphabetically
+        return new Map(
+            [...categories.entries()].sort(([a], [b]) => a.localeCompare(b))
+        );
     };
 
     // Memoized list of log categories
