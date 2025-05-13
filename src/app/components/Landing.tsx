@@ -37,18 +37,15 @@ export default function Landing() {
 
     // Function to parse log categories from the file content
     const parseLogCategories = (content: string): Map<string, string> => {
-        const words = content.split(/\s+/); // Split content into words
+        const lines = content.split("\n"); // Split content into lines
         const categories = new Map<string, string>();
 
-        words.forEach((word) => {
-            const logIndex = word.indexOf("Log");
-            if (logIndex !== -1) {
-                // Extract the part of the word starting from "Log" and remove extra symbols
-                const cleanCategory = word
-                    .substring(logIndex)
-                    .replace(/[^a-zA-Z0-9]/g, ""); // Remove non-alphanumeric characters
-                if (!categories.has(cleanCategory)) {
-                    categories.set(cleanCategory, cleanCategory);
+        lines.forEach((line) => {
+            const match = line.match(/(Log[A-Za-z0-9_]+):/); // Match "LogCategory:"
+            if (match && match[1]) {
+                const category = match[1]; // Extract the category including the colon
+                if (!categories.has(category)) {
+                    categories.set(category, category);
                 }
             }
         });
