@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     Title,
     Text,
@@ -8,12 +8,18 @@ import {
     Textarea,
     Group,
     FileButton,
+    Drawer,
+    ScrollArea,
+    Switch,
 } from "@mantine/core";
-import { GitHub, Terminal } from "react-feather";
+import { GitHub, Sliders, Terminal } from "react-feather";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [enabledCategories, setEnabledCategories] = useState<string[]>([]);
+    const [opened, { open, close }] = useDisclosure(false);
 
     const handleFile = async (file: File | null) => {
         if (!file) return;
@@ -29,11 +35,80 @@ export default function Landing() {
         }
     };
 
+    // Function to parse log categories from the file content
+    const parseLogCategories = (content: string): Map<string, string> => {
+        const words = content.split(/\s+/); // Split content into words
+        const categories = new Map<string, string>();
+
+        words.forEach((word) => {
+            const logIndex = word.indexOf("Log");
+            if (logIndex !== -1) {
+                // Extract the part of the word starting from "Log" and remove extra symbols
+                const cleanCategory = word
+                    .substring(logIndex)
+                    .replace(/[^a-zA-Z0-9]/g, ""); // Remove non-alphanumeric characters
+                if (!categories.has(cleanCategory)) {
+                    categories.set(cleanCategory, cleanCategory);
+                }
+            }
+        });
+
+        return categories;
+    };
+
+    // Memoized list of log categories
+    const logCategories = useMemo(() => {
+        if (!fileContent) return new Map<string, string>();
+        return parseLogCategories(fileContent);
+    }, [fileContent]);
+
+    // Automatically enable all categories when they are determined
+    useEffect(() => {
+        if (logCategories.size > 0) {
+            setEnabledCategories(Array.from(logCategories.keys()));
+        }
+    }, [logCategories]);
+
+    // Filtered content based on enabled categories
+    const filteredContent = useMemo(() => {
+        if (!fileContent || enabledCategories.length === 0) return "";
+
+        return fileContent
+            .split("\n")
+            .filter((line) =>
+                enabledCategories.some((category) => line.includes(category))
+            )
+            .join("\n");
+    }, [fileContent, enabledCategories]);
+
+    // Toggle category enable/disable
+    const toggleCategory = (category: string) => {
+        setEnabledCategories((prev) => {
+            const isCategoryEnabled = prev.includes(category);
+            const updatedCategories = isCategoryEnabled
+                ? prev.filter((c) => c !== category) // Remove category
+                : [...prev, category]; // Add category
+            return updatedCategories;
+        });
+    };
+
+    // Enable all categories
+    const handleEnableAll = () => {
+        setEnabledCategories(Array.from(logCategories.keys()));
+    };
+
+    // Disable all categories
+    const handleDisableAll = () => {
+        setEnabledCategories([]);
+    };
+
+    const bHasValidFile = fileContent !== "";
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
             <div className="bg-gray-100">
-                <div className=" p-2 flex justify-between items-center gap-4 mx-auto max-w-screen-lg">
+                <div className="p-2 flex justify-between items-center gap-4 mx-auto max-w-screen-lg">
                     <a href="https://joshlmao.com" target="_blank">
                         <Group gap={1}>
                             <Terminal color="darkred" />
@@ -47,17 +122,16 @@ export default function Landing() {
                     >
                         <GitHub color="black" />
                     </a>
-                    {/* Add more links/images as needed */}
                 </div>
             </div>
 
             <header className="text-center p-4 flex-none">
                 <Title order={1} className="text-4xl sm:text-5xl">
-                    Slogi
+                    slogi.
                 </Title>
                 <Text className="text-lg sm:text-xl mt-2">
                     A fast and lightweight online tool for debugging and
-                    analyzing Unreal Engine log files
+                    analyzing Unreal Engine log files.
                 </Text>
             </header>
 
@@ -67,7 +141,7 @@ export default function Landing() {
                     <FileButton onChange={handleFile}>
                         {(props) => (
                             <Button {...props} variant="outline">
-                                Pick a file
+                                pick a file.
                             </Button>
                         )}
                     </FileButton>
@@ -80,33 +154,71 @@ export default function Landing() {
                 )}
             </section>
 
-            <section className="p-4 w-full flex-1 flex flex-col">
-                {fileContent && (
-                    <Textarea
-                        value={fileContent
-                            .split("\n")
-                            .map((line, index) => `${index + 1}: ${line}`)
-                            .join("\n")}
-                        readOnly
-                        className="w-full h-full flex flex-col flex-1"
-                        styles={{
-                            input: {
-                                fontFamily: "monospace",
-                                whiteSpace: "pre",
-                                overflowX: "auto",
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "column",
-                            },
-                            wrapper: {
-                                flex: 1,
-                                display: "flex",
-                                flexDirection: "column",
-                            },
-                        }}
-                    />
+            <section className="p-4 flex-1 flex flex-col">
+                {bHasValidFile && (
+                    <>
+                        <div className="pb-2">
+                            <Button className="flex-none" onClick={open}>
+                                <Sliders color="white" className="mr-2" />
+                                options.
+                            </Button>
+                        </div>
+                        <div className="flex-1 flex flex-col">
+                            <Textarea
+                                value={filteredContent}
+                                readOnly
+                                className="w-full h-full flex flex-col flex-1"
+                                styles={{
+                                    input: {
+                                        fontFamily: "monospace",
+                                        whiteSpace: "pre",
+                                        overflowX: "auto",
+                                        flex: 1,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                    },
+                                    wrapper: {
+                                        flex: 1,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                    },
+                                }}
+                            />
+                        </div>
+                    </>
                 )}
             </section>
+
+            <Drawer opened={opened} onClose={close} title="options.">
+                {/* Log Categories */}
+                <div>
+                    <Title order={3}>log categories.</Title>
+                    <ScrollArea
+                        h={400}
+                        overscrollBehavior="auto auto"
+                        scrollbars="y"
+                    >
+                        {Array.from(logCategories.keys()).map((category) => (
+                            <div
+                                key={category}
+                                className="flex items-center mb-2"
+                            >
+                                <Switch
+                                    checked={enabledCategories.includes(
+                                        category
+                                    )}
+                                    onChange={() => toggleCategory(category)}
+                                    label={category}
+                                />
+                            </div>
+                        ))}
+                    </ScrollArea>
+                    <Group>
+                        <Button onClick={handleEnableAll}>all enable.</Button>
+                        <Button onClick={handleDisableAll}>all disable.</Button>
+                    </Group>
+                </div>
+            </Drawer>
         </div>
     );
 }
