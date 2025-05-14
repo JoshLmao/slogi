@@ -13,31 +13,22 @@ import {
     Switch,
     Select,
     Stack,
+    Grid,
 } from "@mantine/core";
 import { GitHub, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
+import { ELogLevel, parseLogLevel } from "../types/logLevel";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
 
-    const logLevels = useMemo(
-        () => [
-            "Fatal",
-            "Error",
-            "Warning",
-            "Display",
-            "Log",
-            "Verbose",
-            "VeryVerbose",
-        ],
-        []
-    );
+    const logLevelsArray = Object.values(ELogLevel);
 
     // Per-category state: { [category]: { enabled: boolean, minLevel: string } }
     const [categorySettings, setCategorySettings] = useState<{
-        [category: string]: { enabled: boolean; minLevel: string };
+        [category: string]: { enabled: boolean; minLevel: ELogLevel };
     }>({});
 
     const handleFile = async (file: File | null) => {
@@ -122,12 +113,12 @@ export default function Landing() {
     useEffect(() => {
         if (logCategories.size > 0) {
             const newSettings: {
-                [category: string]: { enabled: boolean; minLevel: string };
+                [category: string]: { enabled: boolean; minLevel: ELogLevel };
             } = {};
             Array.from(logCategories.keys()).forEach((cat) => {
                 newSettings[cat] = {
                     enabled: true,
-                    minLevel: "Log", // Default to show most logs (change as desired)
+                    minLevel: ELogLevel.Log, // Default to show most logs (change as desired)
                 };
             });
             setCategorySettings(newSettings);
@@ -137,10 +128,10 @@ export default function Landing() {
     // Filtered content based on categorySettings
     const filteredContent = useMemo(() => {
         // Helper to compare log levels
-        const logLevelIndex = (level: string | null) => {
-            if (!level) return logLevels.length; // Treat unknown as lowest
-            const idx = logLevels.indexOf(level);
-            return idx === -1 ? logLevels.length : idx;
+        const logLevelIndex = (level: ELogLevel | null) => {
+            if (!level) return logLevelsArray.length; // Treat unknown as lowest
+            const idx = logLevelsArray.indexOf(level);
+            return idx === -1 ? logLevelsArray.length : idx;
         };
 
         if (!fileContent || Object.keys(categorySettings).length === 0)
@@ -148,7 +139,7 @@ export default function Landing() {
         return parsedLogLines
             .filter((entry) => {
                 const cat = entry.category;
-                const level = entry.level;
+                const level: ELogLevel = parseLogLevel(entry.level);
                 if (cat) {
                     // Normal category filtering
                     if (!categorySettings[cat]?.enabled) return false;
@@ -159,14 +150,14 @@ export default function Landing() {
                     return Object.values(categorySettings).some(
                         (settings) =>
                             settings.enabled &&
-                            logLevelIndex("Log") <=
+                            logLevelIndex(ELogLevel.Log) <=
                                 logLevelIndex(settings.minLevel)
                     );
                 }
             })
             .map((entry) => entry.line)
             .join("\n");
-    }, [parsedLogLines, categorySettings, fileContent, logLevels]);
+    }, [parsedLogLines, categorySettings, fileContent, logLevelsArray]);
 
     // Toggle category enable/disable
     const toggleCategory = (category: string) => {
@@ -180,7 +171,7 @@ export default function Landing() {
     };
 
     // Handler for changing min log level
-    const setCategoryLevel = (category: string, minLevel: string) => {
+    const setCategoryLevel = (category: string, minLevel: ELogLevel) => {
         setCategorySettings((prev) => ({
             ...prev,
             [category]: {
@@ -216,7 +207,7 @@ export default function Landing() {
         setCategorySettings((prev) => {
             const updated = { ...prev };
             Object.keys(updated).forEach((cat) => {
-                updated[cat].minLevel = "Display";
+                updated[cat].minLevel = ELogLevel.Display;
             });
             return { ...updated };
         });
@@ -327,44 +318,55 @@ export default function Landing() {
                         <Stack gap="xs">
                             {Array.from(logCategories.keys()).map(
                                 (category) => (
-                                    <Group
-                                        key={category}
-                                        gap={2}
-                                        justify="space-between"
-                                    >
-                                        <Switch
-                                            checked={
-                                                categorySettings[category]
-                                                    ?.enabled
-                                            }
-                                            onChange={() =>
-                                                toggleCategory(category)
-                                            }
-                                            label={category}
-                                        />
-                                        <div className="flex flex-row">
-                                            <Select
-                                                data={logLevels}
-                                                value={
+                                    <Grid key={category}>
+                                        <Grid.Col span={8}>
+                                            <Switch
+                                                checked={
                                                     categorySettings[category]
-                                                        ?.minLevel
-                                                }
-                                                onChange={(val) =>
-                                                    val &&
-                                                    setCategoryLevel(
-                                                        category,
-                                                        val
-                                                    )
-                                                }
-                                                size="xs"
-                                                style={{ maxWidth: 120 }}
-                                                disabled={
-                                                    !categorySettings[category]
                                                         ?.enabled
                                                 }
+                                                onChange={() =>
+                                                    toggleCategory(category)
+                                                }
+                                                label={
+                                                    <span
+                                                        style={{
+                                                            wordBreak:
+                                                                "break-word",
+                                                        }}
+                                                    >
+                                                        {category}
+                                                    </span>
+                                                }
                                             />
-                                        </div>
-                                    </Group>
+                                        </Grid.Col>
+                                        <Grid.Col span={4}>
+                                            <div className="flex flex-row">
+                                                <Select
+                                                    data={logLevelsArray}
+                                                    value={
+                                                        categorySettings[
+                                                            category
+                                                        ]?.minLevel
+                                                    }
+                                                    onChange={(val) =>
+                                                        val &&
+                                                        setCategoryLevel(
+                                                            category,
+                                                            parseLogLevel(val)
+                                                        )
+                                                    }
+                                                    size="xs"
+                                                    style={{ maxWidth: 120 }}
+                                                    disabled={
+                                                        !categorySettings[
+                                                            category
+                                                        ]?.enabled
+                                                    }
+                                                />
+                                            </div>
+                                        </Grid.Col>
+                                    </Grid>
                                 )
                             )}
                         </Stack>
