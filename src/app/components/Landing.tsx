@@ -80,6 +80,10 @@ export default function Landing() {
                     level = levelMatch[1];
                 }
             }
+            // If no category, assign level 'Log' for filtering
+            if (!category) {
+                level = "Log";
+            }
             return { line, category, level };
         });
     };
@@ -123,7 +127,7 @@ export default function Landing() {
             Array.from(logCategories.keys()).forEach((cat) => {
                 newSettings[cat] = {
                     enabled: true,
-                    minLevel: "Display", // Default to show most logs (change as desired)
+                    minLevel: "Log", // Default to show most logs (change as desired)
                 };
             });
             setCategorySettings(newSettings);
@@ -145,10 +149,20 @@ export default function Landing() {
             .filter((entry) => {
                 const cat = entry.category;
                 const level = entry.level;
-                if (!cat || !categorySettings[cat]?.enabled) return false;
-                // Only show if log level is >= minLevel (i.e., more severe or equal)
-                const minLevel = categorySettings[cat].minLevel;
-                return logLevelIndex(level) <= logLevelIndex(minLevel);
+                if (cat) {
+                    // Normal category filtering
+                    if (!categorySettings[cat]?.enabled) return false;
+                    const minLevel = categorySettings[cat].minLevel;
+                    return logLevelIndex(level) <= logLevelIndex(minLevel);
+                } else {
+                    // No category: show if ANY enabled category's minLevel is 'Log' or lower
+                    return Object.values(categorySettings).some(
+                        (settings) =>
+                            settings.enabled &&
+                            logLevelIndex("Log") <=
+                                logLevelIndex(settings.minLevel)
+                    );
+                }
             })
             .map((entry) => entry.line)
             .join("\n");
