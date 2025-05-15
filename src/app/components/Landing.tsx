@@ -49,32 +49,27 @@ export default function Landing() {
     const parseLogLines = (content: string) => {
         const lines = content.split("\n");
         return lines.map((line) => {
-            // Regex: [timestamp][thread]LogCategory: Level: ...
-            // Example: [2025.01.15-18.39.39:991][  0]LogGameFeatures: Display: ...
-            const match = line.match(/(Log[A-Za-z0-9_]+):\s*([A-Za-z]+):/);
-            let category = null;
-            let level = null;
-            if (match) {
-                category = match[1];
-                level = match[2];
-            } else {
-                // Try to match just the category
-                const catMatch = line.match(/(Log[A-Za-z0-9_]+):/);
-                if (catMatch) {
-                    category = catMatch[1];
-                }
-                // Try to match just the level
-                const levelMatch = line.match(
-                    /(Error|Warning|Log|Verbose|VeryVerbose|Display|Fatal):/
-                );
-                if (levelMatch) {
-                    level = levelMatch[1];
-                }
-            }
-            // If no category, assign level 'Log' for filtering
-            if (!category) {
-                level = "Log";
-            }
+            // Regex to match: [date][thread]Category: Level: Text
+            // Category: any word ending with a colon, not preceded by a date/time
+            // Level: Fatal, Error, Warning, Display, Log, Verbose, VeryVerbose (with colon)
+            const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
+            const rest = line.replace(dateTimePattern, ""); // Remove date/time if present
+
+            // Try to extract category (first word ending with a colon, before a known level)
+            const categoryMatch = rest.match(/^([A-Za-z0-9_]+):/);
+            let category = categoryMatch ? categoryMatch[1] : null;
+
+            // Try to extract level (must be one of the known levels, with colon)
+            const levelMatch = rest.match(
+                /\b(Fatal|Error|Warning|Display|Log|Verbose|VeryVerbose):/
+            );
+            let level = levelMatch ? levelMatch[1] : null;
+
+            // If no category, assign "NoLogCategory"
+            if (!category) category = "NoLogCategory";
+            // If no level, assign "Log"
+            if (!level) level = "Log";
+
             return { line, category, level };
         });
     };
@@ -84,12 +79,13 @@ export default function Landing() {
         const lines = content.split("\n");
         const categories = new Map<string, string>();
         lines.forEach((line) => {
-            const match = line.match(/(Log[A-Za-z0-9_]+):/);
-            if (match && match[1]) {
-                const category = match[1];
-                if (!categories.has(category)) {
-                    categories.set(category, category);
-                }
+            // Remove date/time if present
+            const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
+            const rest = line.replace(dateTimePattern, "");
+            const categoryMatch = rest.match(/^([A-Za-z0-9_]+):/);
+            const category = categoryMatch ? categoryMatch[1] : "NoLogCategory";
+            if (!categories.has(category)) {
+                categories.set(category, category);
             }
         });
         return new Map(
