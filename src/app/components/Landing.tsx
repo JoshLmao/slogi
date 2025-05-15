@@ -45,24 +45,45 @@ export default function Landing() {
         }
     };
 
-    // Parse log lines to extract category and level
+    // Parse log lines to extract category and level, supporting multiline logs and flexible category names
     const parseLogLines = (content: string) => {
         const lines = content.split("\n");
-        return lines.map((line) => {
-            // Regex to match: [date][thread]Category: Level: Text
-            // Category: any word ending with a colon, not preceded by a date/time
-            // Level: Fatal, Error, Warning, Display, Log, Verbose, VeryVerbose (with colon)
-            const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
-            const rest = line.replace(dateTimePattern, ""); // Remove date/time if present
+        const entries: Array<{
+            line: string;
+            category: string;
+            level: string;
+            multiline?: string[];
+        }> = [];
+        let lastEntry: {
+            line: string;
+            category: string;
+            level: string;
+            multiline?: string[];
+        } | null = null;
 
-            // Try to extract category (first word ending with a colon, before a known level)
-            const categoryMatch = rest.match(/^([A-Za-z0-9_]+):/);
+        // Regex patterns
+        const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
+        const categoryPattern = /^([A-Za-z0-9_]+):/; // e.g., LogConsoleResponse: or SourceControl:
+        const levelPattern =
+            /\b(Fatal|Error|Warning|Display|Log|Verbose|VeryVerbose):/;
+
+        lines.forEach((line) => {
+            // Multiline: indented or dash-prefixed lines (not a new log entry)
+            if (/^\s+|^- /.test(line) && lastEntry) {
+                if (!lastEntry.multiline) lastEntry.multiline = [];
+                lastEntry.multiline.push(line);
+                return;
+            }
+
+            // Remove date/time if present
+            const rest = line.replace(dateTimePattern, "");
+
+            // Try to extract category (first word ending with a colon)
+            const categoryMatch = rest.match(categoryPattern);
             let category = categoryMatch ? categoryMatch[1] : null;
 
             // Try to extract level (must be one of the known levels, with colon)
-            const levelMatch = rest.match(
-                /\b(Fatal|Error|Warning|Display|Log|Verbose|VeryVerbose):/
-            );
+            const levelMatch = rest.match(levelPattern);
             let level = levelMatch ? levelMatch[1] : null;
 
             // If no category, assign "NoLogCategory"
@@ -70,19 +91,23 @@ export default function Landing() {
             // If no level, assign "Log"
             if (!level) level = "Log";
 
-            return { line, category, level };
+            const entry = { line, category, level };
+            entries.push(entry);
+            lastEntry = entry;
         });
+        return entries;
     };
 
-    // Function to parse log categories from the file content
+    // Function to parse log categories from the file content, supporting categories that don't start with "Log"
     const parseLogCategories = (content: string): Map<string, string> => {
         const lines = content.split("\n");
         const categories = new Map<string, string>();
+        const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
+        const categoryPattern = /^([A-Za-z0-9_]+):/;
         lines.forEach((line) => {
             // Remove date/time if present
-            const dateTimePattern = /^\[[^\]]+\]\[\s*\d+\]\s*/;
             const rest = line.replace(dateTimePattern, "");
-            const categoryMatch = rest.match(/^([A-Za-z0-9_]+):/);
+            const categoryMatch = rest.match(categoryPattern);
             const category = categoryMatch ? categoryMatch[1] : "NoLogCategory";
             if (!categories.has(category)) {
                 categories.set(category, category);
@@ -121,7 +146,7 @@ export default function Landing() {
         }
     }, [logCategories]);
 
-    // Filtered content based on categorySettings
+    // Filtered content based on categorySettings, including multiline logs
     const filteredContent = useMemo(() => {
         // Helper to compare log levels
         const logLevelIndex = (level: ELogLevel | null) => {
@@ -132,27 +157,33 @@ export default function Landing() {
 
         if (!fileContent || Object.keys(categorySettings).length === 0)
             return "";
-        return parsedLogLines
-            .filter((entry) => {
-                const cat = entry.category;
-                const level: ELogLevel = parseLogLevel(entry.level);
-                if (cat) {
-                    // Normal category filtering
-                    if (!categorySettings[cat]?.enabled) return false;
+        const lines: string[] = [];
+        parsedLogLines.forEach((entry) => {
+            const cat = entry.category;
+            const level: ELogLevel = parseLogLevel(entry.level);
+            let show = false;
+            if (cat) {
+                if (categorySettings[cat]?.enabled) {
                     const minLevel = categorySettings[cat].minLevel;
-                    return logLevelIndex(level) <= logLevelIndex(minLevel);
-                } else {
-                    // No category: show if ANY enabled category's minLevel is 'Log' or lower
-                    return Object.values(categorySettings).some(
-                        (settings) =>
-                            settings.enabled &&
-                            logLevelIndex(ELogLevel.Log) <=
-                                logLevelIndex(settings.minLevel)
-                    );
+                    show = logLevelIndex(level) <= logLevelIndex(minLevel);
                 }
-            })
-            .map((entry) => entry.line)
-            .join("\n");
+            } else {
+                // No category: show if ANY enabled category's minLevel is 'Log' or lower
+                show = Object.values(categorySettings).some(
+                    (settings) =>
+                        settings.enabled &&
+                        logLevelIndex(ELogLevel.Log) <=
+                            logLevelIndex(settings.minLevel)
+                );
+            }
+            if (show) {
+                lines.push(entry.line);
+                if (entry.multiline && entry.multiline.length > 0) {
+                    lines.push(...entry.multiline);
+                }
+            }
+        });
+        return lines.join("\n");
     }, [parsedLogLines, categorySettings, fileContent, logLevelsArray]);
 
     // Toggle category enable/disable
