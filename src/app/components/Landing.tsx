@@ -161,12 +161,17 @@ export default function Landing() {
     };
 
     const handleRevertLevels = () => {
+        if (!fileContent) return;
+        const { categorySettings: defaultSettings } =
+            getDefaultCategorySettings(fileContent, logLevelsArray);
         setCategorySettings((prev) => {
             const updated = { ...prev };
             Object.keys(updated).forEach((cat) => {
-                updated[cat].minLevel = ELogLevel.Display;
+                if (defaultSettings[cat]) {
+                    updated[cat].minLevel = defaultSettings[cat].minLevel;
+                }
             });
-            return { ...updated };
+            return updated;
         });
     };
 
