@@ -15,6 +15,7 @@ import {
     Stack,
     Grid,
     Alert,
+    Flex,
 } from "@mantine/core";
 import { GitHub, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -263,29 +264,36 @@ export default function Landing() {
                 title="options."
             >
                 {/* Log Categories */}
-                <div>
-                    <Alert
-                        variant="light"
-                        color="blue"
-                        title="log level info."
-                        mb="xs"
-                    >
+                <Flex
+                    direction="column"
+                    gap="xs"
+                    // Use calc to fill Drawer height minus header/footer
+                    // Mantine Drawer header is 56px by default, plus 24px padding
+                    // Adjust as needed if you have custom header/footer
+                    h="calc(100vh - 80px)"
+                    style={{ minHeight: 0 }}
+                >
+                    <Alert variant="light" color="blue" title="log level info.">
                         Log is the default log level for any lines that
                         don&apos;t contain a log level
                     </Alert>
                     <Title order={3}>log categories.</Title>
-                    <Group py="sm">
-                        <Button onClick={handleEnableAll}>all enable.</Button>
-                        <Button onClick={handleDisableAll}>all disable.</Button>
-                        <Button onClick={handleRevertLevels}>
-                            revert levels.
+                    <Group justify="center">
+                        <Button size="compact-sm" onClick={handleEnableAll}>
+                            all enable.
+                        </Button>
+                        <Button size="compact-sm" onClick={handleDisableAll}>
+                            all disable.
+                        </Button>
+                        <Button size="compact-sm" onClick={handleRevertLevels}>
+                            default levels.
                         </Button>
                     </Group>
                     <ScrollArea
-                        h={"65vh"}
                         overscrollBehavior="auto auto"
                         scrollbars="y"
                         offsetScrollbars
+                        style={{ flex: 1, minHeight: 0 }}
                     >
                         <Stack gap="xs">
                             {Array.from(logCategories.keys()).map(
@@ -352,7 +360,7 @@ export default function Landing() {
                             )}
                         </Stack>
                     </ScrollArea>
-                </div>
+                </Flex>
             </Drawer>
         </div>
     );
