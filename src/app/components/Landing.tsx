@@ -51,21 +51,51 @@ export default function Landing() {
         return parseLogCategories(fileContent);
     }, [fileContent]);
 
-    // When logCategories changes, initialize categorySettings
+    // Helper: For each category, get which log levels are present in the file
+    const categoryLevelPresence = useMemo(() => {
+        const presence: { [category: string]: Set<string> } = {};
+        parsedLogLines.forEach((entry) => {
+            if (!presence[entry.category]) presence[entry.category] = new Set();
+            presence[entry.category].add(entry.level);
+        });
+        return presence;
+    }, [parsedLogLines]);
+
+    // When logCategories changes, initialize categorySettings only if categories are new or fileContent changed
     useEffect(() => {
-        if (logCategories.size > 0) {
+        if (logCategories.size === 0) return;
+        // Only set if categorySettings is empty (first load or file change)
+        if (Object.keys(categorySettings).length === 0) {
             const newSettings: {
                 [category: string]: { enabled: boolean; minLevel: ELogLevel };
             } = {};
             Array.from(logCategories.keys()).forEach((cat) => {
+                // Find the lowest log level present for this category
+                const presentLevels = categoryLevelPresence[cat];
+                let minLevel = ELogLevel.Log;
+                const reversedLogLevels = logLevelsArray.reverse();
+                if (presentLevels && presentLevels.size > 0) {
+                    // Find the lowest index in logLevelsArray (lowest = lowest severity)
+                    let minIdx = logLevelsArray.length;
+                    reversedLogLevels.forEach((level, idx) => {
+                        if (presentLevels.has(level) && idx < minIdx) {
+                            minIdx = idx;
+                        }
+                    });
+                    minLevel =
+                        minIdx < logLevelsArray.length
+                            ? logLevelsArray[minIdx]
+                            : ELogLevel.Log;
+                }
                 newSettings[cat] = {
                     enabled: true,
-                    minLevel: ELogLevel.Log, // Default to show most logs (change as desired)
+                    minLevel,
                 };
             });
             setCategorySettings(newSettings);
         }
-    }, [logCategories]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [logCategories, fileContent, logLevelsArray, categoryLevelPresence]);
 
     // Filtered content based on categorySettings, including multiline logs
     const filteredContent = useMemo(() => {
@@ -291,7 +321,16 @@ export default function Landing() {
                                         <Grid.Col span={4}>
                                             <div className="flex flex-row">
                                                 <Select
-                                                    data={logLevelsArray}
+                                                    data={logLevelsArray.map(
+                                                        (level) => ({
+                                                            value: level,
+                                                            label: level,
+                                                            disabled:
+                                                                !categoryLevelPresence[
+                                                                    category
+                                                                ]?.has(level),
+                                                        })
+                                                    )}
                                                     value={
                                                         categorySettings[
                                                             category
