@@ -14,6 +14,7 @@ import {
     Select,
     Stack,
     Grid,
+    Alert,
 } from "@mantine/core";
 import { GitHub, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -263,9 +264,25 @@ export default function Landing() {
             >
                 {/* Log Categories */}
                 <div>
+                    <Alert
+                        variant="light"
+                        color="blue"
+                        title="log level info."
+                        mb="xs"
+                    >
+                        Log is the default log level for any lines that
+                        don&apos;t contain a log level
+                    </Alert>
                     <Title order={3}>log categories.</Title>
+                    <Group py="sm">
+                        <Button onClick={handleEnableAll}>all enable.</Button>
+                        <Button onClick={handleDisableAll}>all disable.</Button>
+                        <Button onClick={handleRevertLevels}>
+                            revert levels.
+                        </Button>
+                    </Group>
                     <ScrollArea
-                        h={"75vh"}
+                        h={"65vh"}
                         overscrollBehavior="auto auto"
                         scrollbars="y"
                         offsetScrollbars
@@ -335,13 +352,6 @@ export default function Landing() {
                             )}
                         </Stack>
                     </ScrollArea>
-                    <Group>
-                        <Button onClick={handleEnableAll}>all enable.</Button>
-                        <Button onClick={handleDisableAll}>all disable.</Button>
-                        <Button onClick={handleRevertLevels}>
-                            revert levels.
-                        </Button>
-                    </Group>
                 </div>
             </Drawer>
         </div>
