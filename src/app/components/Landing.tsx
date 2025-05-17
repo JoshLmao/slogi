@@ -208,9 +208,9 @@ export default function Landing() {
                 </Text>
             </header>
 
-            <section className="w-full max-w-3xl mx-auto p-4 flex-none">
-                <Group align="center">
-                    <Text className="text-lg">Choose a log file:</Text>
+            <section className="w-full max-w-3xl mx-auto flex-none">
+                <Group align="center" justify="center">
+                    <Text className="text-lg">choose a log file.</Text>
                     <FileButton onChange={handleFile}>
                         {(props) => (
                             <Button {...props} variant="outline">
