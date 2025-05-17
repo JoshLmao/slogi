@@ -9,6 +9,7 @@ import {
     Group,
     FileButton,
     Drawer,
+    Select,
 } from "@mantine/core";
 import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -25,6 +26,7 @@ export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
+    const [language, setLanguage] = useState<string>("en");
 
     const logLevelsArray = Object.values(ELogLevel);
 
@@ -178,6 +180,13 @@ export default function Landing() {
 
     const bHasValidFile = fileContent !== "" && fileContent !== null;
 
+    // Language options for easy expansion
+    const languageOptions = [
+        { value: "en", label: "English" },
+        { value: "zh", label: "简体中文" },
+        // Add more languages here as needed
+    ];
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
@@ -189,13 +198,23 @@ export default function Landing() {
                             by joshlmao
                         </Group>
                     </a>
-                    <a
-                        href="https://github.com/joshlmao/slogi"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <GitHub color="black" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                        <Select
+                            data={languageOptions}
+                            value={language}
+                            onChange={(value) => value && setLanguage(value)}
+                            size="xs"
+                            className="w-28"
+                            aria-label="Select language"
+                        />
+                        <a
+                            href="https://github.com/joshlmao/slogi"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <GitHub color="black" />
+                        </a>
+                    </div>
                 </div>
             </div>
 
