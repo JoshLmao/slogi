@@ -191,6 +191,7 @@ export default function Landing() {
     const languageOptions = [
         { value: "en", label: "English" },
         { value: "zh", label: "简体中文" },
+        { value: "sv", label: "Svenska" },
         // Add more languages here as needed
     ];
 

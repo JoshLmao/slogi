@@ -3,10 +3,12 @@ import { initReactI18next } from 'react-i18next';
 
 import en from '../public/locales/en/common.json';
 import zh from '../public/locales/zh/common.json';
+import sv from '../public/locales/sv/common.json';
 
 const resources = {
     en: { common: en },
     zh: { common: zh },
+    sv: { common: sv },
 };
 
 if (!i18n.isInitialized) {
