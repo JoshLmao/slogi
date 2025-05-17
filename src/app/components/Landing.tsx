@@ -10,7 +10,7 @@ import {
     FileButton,
     Drawer,
 } from "@mantine/core";
-import { GitHub, Sliders, Terminal } from "react-feather";
+import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
 import { ELogLevel, parseLogLevel } from "../types/logLevel";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
@@ -37,6 +37,13 @@ export default function Landing() {
         const result = await handleFileParsing(file);
         setFileContent(result.content);
         setError(result.error);
+    };
+
+    // New: Clear all state and start over
+    const handleStartOver = () => {
+        setFileContent(null);
+        setError(null);
+        setCategorySettings({});
     };
 
     // Memoized parsed log lines
@@ -169,7 +176,7 @@ export default function Landing() {
         });
     };
 
-    const bHasValidFile = fileContent !== "";
+    const bHasValidFile = fileContent !== "" && fileContent !== null;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -202,34 +209,52 @@ export default function Landing() {
                 </Text>
             </header>
 
-            <section className="w-full max-w-3xl mx-auto flex-none">
-                <Group align="center" justify="center">
-                    <Text className="text-lg">choose a log file.</Text>
-                    <FileButton onChange={handleFile}>
-                        {(props) => (
-                            <Button {...props} variant="outline">
-                                pick a file.
-                            </Button>
-                        )}
-                    </FileButton>
-                </Group>
+            {/* File picker section: only show if no file is loaded */}
+            {!bHasValidFile && (
+                <section className="w-full max-w-3xl mx-auto flex-none">
+                    <Group align="center" justify="center">
+                        <Text className="text-lg">choose a log file.</Text>
+                        <FileButton onChange={handleFile}>
+                            {(props) => (
+                                <Button {...props} variant="outline">
+                                    pick a file.
+                                </Button>
+                            )}
+                        </FileButton>
+                    </Group>
 
-                {error && (
-                    <Text color="red" className="text-center mb-4">
-                        {error}
-                    </Text>
-                )}
-            </section>
+                    {error && (
+                        <Text color="red" className="text-center mb-4">
+                            {error}
+                        </Text>
+                    )}
+                </section>
+            )}
+
+            {/* Start Over button: only show if a file is loaded */}
+            {bHasValidFile && (
+                <section className="px-4 flex flex-row items-center relative">
+                    <div className="absolute left-1/2 -translate-x-1/2">
+                        <Button
+                            onClick={handleStartOver}
+                            className="text-center"
+                        >
+                            <RotateCcw color="white" className="mr-2" />
+                            restart.
+                        </Button>
+                    </div>
+                    <div className="ml-auto">
+                        <Button onClick={open}>
+                            <Sliders color="white" className="mr-2" />
+                            options.
+                        </Button>
+                    </div>
+                </section>
+            )}
 
             <section className="p-4 flex-1 flex flex-col">
                 {bHasValidFile && (
                     <>
-                        <div className="pb-2 ml-auto">
-                            <Button className="flex-none" onClick={open}>
-                                <Sliders color="white" className="mr-2" />
-                                options.
-                            </Button>
-                        </div>
                         <div className="flex-1 flex flex-col">
                             <Textarea
                                 value={filteredContent}
