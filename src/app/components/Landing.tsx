@@ -24,6 +24,7 @@ import LogOptionsDrawer from "./LogOptionsDrawer";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import "../../i18n";
+import Image from "next/image";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -221,15 +222,23 @@ export default function Landing() {
                             {t("by_author")}
                         </Group>
                     </a>
-                    <div className="flex items-center gap-2">
-                        <Select
-                            data={languageOptions}
-                            value={language}
-                            onChange={handleLanguageChange}
-                            size="xs"
-                            className="w-28"
-                            aria-label="Select language"
-                        />
+                    <Group gap="md">
+                        <Group gap="xs">
+                            <Image
+                                src="/translate.svg"
+                                alt="Logo"
+                                width={20}
+                                height={20}
+                            />
+                            <Select
+                                data={languageOptions}
+                                value={language}
+                                onChange={handleLanguageChange}
+                                size="xs"
+                                className="w-28"
+                                aria-label="Select language"
+                            />
+                        </Group>
                         <a
                             href="https://github.com/joshlmao/slogi"
                             target="_blank"
@@ -237,7 +246,7 @@ export default function Landing() {
                         >
                             <GitHub color="black" />
                         </a>
-                    </div>
+                    </Group>
                 </div>
             </div>
 
