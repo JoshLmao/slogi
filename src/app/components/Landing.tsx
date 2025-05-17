@@ -202,12 +202,13 @@ export default function Landing() {
         }
     };
 
+    // Check current locale from url and apply in i18n
     useEffect(() => {
         if (typeof window === "undefined") return;
         const currentLocale = window.location.pathname.split("/")[1];
-        i18n.changeLanguage(currentLocale);
         setLanguage(currentLocale);
-    }, [i18n]);
+        i18n.changeLanguage(currentLocale);
+    }, [i18n, language]);
 
     return (
         <div className="min-h-screen flex flex-col">
