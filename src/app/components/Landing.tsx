@@ -21,12 +21,19 @@ import {
     getCategoryLevelPresence,
 } from "../utils/categorySettings";
 import LogOptionsDrawer from "./LogOptionsDrawer";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import "../../i18n";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [language, setLanguage] = useState<string>("en");
+
+    const router = useRouter();
+
+    const { t } = useTranslation("common");
 
     const logLevelsArray = Object.values(ELogLevel);
 
@@ -187,6 +194,13 @@ export default function Landing() {
         // Add more languages here as needed
     ];
 
+    const handleLanguageChange = (value: string | null) => {
+        if (value) {
+            setLanguage(value);
+            router.push(`/${value}`);
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
@@ -195,14 +209,14 @@ export default function Landing() {
                     <a href="https://joshlmao.com" target="_blank">
                         <Group gap={1}>
                             <Terminal color="darkred" />
-                            by joshlmao
+                            {t("by_author")}
                         </Group>
                     </a>
                     <div className="flex items-center gap-2">
                         <Select
                             data={languageOptions}
                             value={language}
-                            onChange={(value) => value && setLanguage(value)}
+                            onChange={handleLanguageChange}
                             size="xs"
                             className="w-28"
                             aria-label="Select language"
@@ -220,11 +234,10 @@ export default function Landing() {
 
             <header className="text-center p-4 flex-none">
                 <Title order={1} className="text-4xl sm:text-5xl">
-                    slogi.
+                    {t("app_title")}
                 </Title>
                 <Text className="text-lg sm:text-xl mt-2">
-                    A fast and lightweight online tool for debugging and
-                    analyzing Unreal Engine log files.
+                    {t("app_subtitle")}
                 </Text>
             </header>
 
@@ -232,11 +245,11 @@ export default function Landing() {
             {!bHasValidFile && (
                 <section className="w-full max-w-3xl mx-auto flex-none">
                     <Group align="center" justify="center">
-                        <Text className="text-lg">choose a log file.</Text>
+                        <Text className="text-lg">{t("choose_log_file")}</Text>
                         <FileButton onChange={handleFile}>
                             {(props) => (
                                 <Button {...props} variant="outline">
-                                    pick a file.
+                                    {t("pick_a_file")}
                                 </Button>
                             )}
                         </FileButton>
@@ -259,13 +272,13 @@ export default function Landing() {
                             className="text-center"
                         >
                             <RotateCcw color="white" className="mr-2" />
-                            restart.
+                            {t("restart")}
                         </Button>
                     </div>
                     <div className="ml-auto">
                         <Button onClick={open}>
                             <Sliders color="white" className="mr-2" />
-                            options.
+                            {t("options")}
                         </Button>
                     </div>
                 </section>
@@ -304,7 +317,7 @@ export default function Landing() {
                 position="right"
                 opened={opened}
                 onClose={close}
-                title="options."
+                title={t("options")}
             >
                 {/* Log Categories */}
                 <LogOptionsDrawer

@@ -1,0 +1,9 @@
+{
+    "choose_log_file": "选择日志文件。",
+    "pick_a_file": "选择文件。",
+    "restart": "重新开始。",
+    "options": "选项。",
+    "by_author": "作者 joshlmao",
+    "app_title": "slogi.",
+    "app_subtitle": "一个用于调试和分析虚幻引擎日志文件的快速轻量级在线工具。"
+}
