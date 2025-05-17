@@ -205,13 +205,9 @@ export default function Landing() {
     useEffect(() => {
         if (typeof window === "undefined") return;
         const currentLocale = window.location.pathname.split("/")[1];
-        if (currentLocale && currentLocale !== language) {
-            setLanguage(currentLocale);
-        }
-        if (currentLocale && i18n.language !== currentLocale) {
-            i18n.changeLanguage(currentLocale);
-        }
-    }, [i18n, language]);
+        i18n.changeLanguage(currentLocale);
+        setLanguage(currentLocale);
+    }, [i18n]);
 
     return (
         <div className="min-h-screen flex flex-col">
