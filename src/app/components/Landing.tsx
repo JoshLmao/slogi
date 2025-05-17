@@ -9,13 +9,6 @@ import {
     Group,
     FileButton,
     Drawer,
-    ScrollArea,
-    Switch,
-    Select,
-    Stack,
-    Grid,
-    Alert,
-    Flex,
 } from "@mantine/core";
 import { GitHub, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -26,6 +19,7 @@ import {
     getDefaultCategorySettings,
     getCategoryLevelPresence,
 } from "../utils/categorySettings";
+import LogOptionsDrawer from "./LogOptionsDrawer";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -269,103 +263,19 @@ export default function Landing() {
                 title="options."
             >
                 {/* Log Categories */}
-                <Flex
-                    direction="column"
-                    gap="xs"
-                    // Use calc to fill Drawer height minus header/footer
-                    // Mantine Drawer header is 56px by default, plus 24px padding
-                    // Adjust as needed if you have custom header/footer
-                    h="calc(100vh - 80px)"
-                    style={{ minHeight: 0 }}
-                >
-                    <Alert variant="light" color="blue" title="log level info.">
-                        Log is the default log level for any lines that
-                        don&apos;t contain a log level
-                    </Alert>
-                    <Title order={3}>log categories.</Title>
-                    <Group justify="center">
-                        <Button size="compact-sm" onClick={handleEnableAll}>
-                            all enable.
-                        </Button>
-                        <Button size="compact-sm" onClick={handleDisableAll}>
-                            all disable.
-                        </Button>
-                        <Button size="compact-sm" onClick={handleRevertLevels}>
-                            default levels.
-                        </Button>
-                    </Group>
-                    <ScrollArea
-                        overscrollBehavior="auto auto"
-                        scrollbars="y"
-                        offsetScrollbars
-                        style={{ flex: 1, minHeight: 0 }}
-                    >
-                        <Stack gap="xs">
-                            {Array.from(logCategories.keys()).map(
-                                (category) => (
-                                    <Grid key={category}>
-                                        <Grid.Col span={8}>
-                                            <Switch
-                                                checked={
-                                                    categorySettings[category]
-                                                        ?.enabled
-                                                }
-                                                onChange={() =>
-                                                    toggleCategory(category)
-                                                }
-                                                label={
-                                                    <span
-                                                        style={{
-                                                            wordBreak:
-                                                                "break-word",
-                                                        }}
-                                                    >
-                                                        {category}
-                                                    </span>
-                                                }
-                                            />
-                                        </Grid.Col>
-                                        <Grid.Col span={4}>
-                                            <div className="flex flex-row">
-                                                <Select
-                                                    data={logLevelsArray.map(
-                                                        (level) => ({
-                                                            value: level,
-                                                            label: level,
-                                                            disabled:
-                                                                !categoryLevelPresence[
-                                                                    category
-                                                                ]?.has(level),
-                                                        })
-                                                    )}
-                                                    value={
-                                                        categorySettings[
-                                                            category
-                                                        ]?.minLevel
-                                                    }
-                                                    onChange={(val) =>
-                                                        val &&
-                                                        setCategoryLevel(
-                                                            category,
-                                                            parseLogLevel(val)
-                                                        )
-                                                    }
-                                                    size="xs"
-                                                    style={{ maxWidth: 120 }}
-                                                    disabled={
-                                                        !categorySettings[
-                                                            category
-                                                        ]?.enabled
-                                                    }
-                                                />
-                                            </div>
-                                        </Grid.Col>
-                                    </Grid>
-                                )
-                            )}
-                        </Stack>
-                    </ScrollArea>
-                </Flex>
+                <LogOptionsDrawer
+                    opened={opened}
+                    onClose={close}
+                    logCategories={logCategories}
+                    categorySettings={categorySettings}
+                    categoryLevelPresence={categoryLevelPresence}
+                    logLevelsArray={logLevelsArray}
+                    handleEnableAll={handleEnableAll}
+                    handleDisableAll={handleDisableAll}
+                    handleRevertLevels={handleRevertLevels}
+                    toggleCategory={toggleCategory}
+                    setCategoryLevel={setCategoryLevel}
+                />
             </Drawer>
         </div>
     );
