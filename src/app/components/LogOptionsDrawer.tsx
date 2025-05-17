@@ -15,6 +15,7 @@ import {
 } from "@mantine/core";
 import { ELogLevel, parseLogLevel } from "../types/logLevel";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface LogOptionsDrawerProps {
     opened: boolean;
@@ -45,6 +46,7 @@ const LogOptionsDrawer: React.FC<LogOptionsDrawerProps> = ({
     toggleCategory,
     setCategoryLevel,
 }) => {
+    const { t } = useTranslation("common");
     const [search, setSearch] = useState("");
     const filteredCategories =
         search.trim().length === 0
@@ -58,7 +60,7 @@ const LogOptionsDrawer: React.FC<LogOptionsDrawerProps> = ({
             position="right"
             opened={opened}
             onClose={onClose}
-            title="options."
+            title={t("options")}
             size="lg"
             overlayProps={{ backgroundOpacity: 0 }}
         >
@@ -68,19 +70,22 @@ const LogOptionsDrawer: React.FC<LogOptionsDrawerProps> = ({
                 h="calc(100vh - 80px)"
                 style={{ minHeight: 0 }}
             >
-                <Alert variant="light" color="blue" title="log level info.">
-                    Log is the default log level for any lines that don&apos;t
-                    contain a log level
+                <Alert
+                    variant="light"
+                    color="blue"
+                    title={t("log_level_info_title")}
+                >
+                    {t("log_level_info_desc")}
                 </Alert>
                 <Group align="stretch" className="flex flex-col">
-                    <Title order={3}>log categories.</Title>
+                    <Title order={3}>{t("log_categories")}</Title>
                     <Group align="stretch" className="flex-1">
                         <TextInput
                             size="xs"
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="filter categories..."
+                            placeholder={t("filter_categories")}
                             style={{ flex: 1 }}
                         />
                         <Button
@@ -89,19 +94,19 @@ const LogOptionsDrawer: React.FC<LogOptionsDrawerProps> = ({
                             onClick={() => setSearch("")}
                             style={{ flex: "none" }}
                         >
-                            clear.
+                            {t("clear")}
                         </Button>
                     </Group>
                 </Group>
                 <Group justify="center">
                     <Button size="compact-sm" onClick={handleEnableAll}>
-                        enable all.
+                        {t("enable_all")}
                     </Button>
                     <Button size="compact-sm" onClick={handleDisableAll}>
-                        disable all.
+                        {t("disable_all")}
                     </Button>
                     <Button size="compact-sm" onClick={handleRevertLevels}>
-                        default levels.
+                        {t("default_levels")}
                     </Button>
                 </Group>
                 <ScrollArea

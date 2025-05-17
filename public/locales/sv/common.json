@@ -5,5 +5,13 @@
     "options": "alternativ.",
     "by_author": "av joshlmao",
     "app_title": "slogi.",
-    "app_subtitle": "Ett snabbt och lättviktigt onlineverktyg för felsökning och analys av Unreal Engine-loggfiler."
+    "app_subtitle": "Ett snabbt och lättviktigt onlineverktyg för felsökning och analys av Unreal Engine-loggfiler.",
+    "log_level_info_title": "loggnivå info.",
+    "log_level_info_desc": "Logg är standardnivån för alla rader som inte innehåller en loggnivå.",
+    "log_categories": "loggkategorier.",
+    "filter_categories": "filtrera kategorier...",
+    "clear": "rensa",
+    "enable_all": "aktivera alla.",
+    "disable_all": "inaktivera alla.",
+    "default_levels": "standardnivåer."
 }
