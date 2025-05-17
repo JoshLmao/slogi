@@ -33,7 +33,7 @@ export default function Landing() {
 
     const router = useRouter();
 
-    const { t } = useTranslation("common");
+    const { t, i18n } = useTranslation("common");
 
     const logLevelsArray = Object.values(ELogLevel);
 
@@ -200,6 +200,17 @@ export default function Landing() {
             router.push(`/${value}`);
         }
     };
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const currentLocale = window.location.pathname.split("/")[1];
+        if (currentLocale && currentLocale !== language) {
+            setLanguage(currentLocale);
+        }
+        if (currentLocale && i18n.language !== currentLocale) {
+            i18n.changeLanguage(currentLocale);
+        }
+    }, [i18n, language]);
 
     return (
         <div className="min-h-screen flex flex-col">
