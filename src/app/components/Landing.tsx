@@ -5,7 +5,6 @@ import {
     Title,
     Text,
     Button,
-    Textarea,
     Group,
     FileButton,
     Drawer,
@@ -13,7 +12,7 @@ import {
 } from "@mantine/core";
 import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
-import { ELogLevel, parseLogLevel } from "../types/logLevel";
+import { ELogLevel, parseLogLevel, getLogLevelColor } from "../types/logLevel";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
 import { handleFileParsing } from "../utils/fileParser";
 import {
@@ -26,6 +25,7 @@ import { useRouter } from "next/navigation";
 import "../../i18n";
 import Image from "next/image";
 import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
+import Editor from "@monaco-editor/react";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -98,8 +98,8 @@ export default function Landing() {
         };
 
         if (!fileContent || Object.keys(categorySettings).length === 0)
-            return "";
-        const lines: string[] = [];
+            return [];
+        const lines: { text: string; color: string }[] = [];
         parsedLogLines.forEach((entry) => {
             const cat = entry.category;
             const level: ELogLevel = parseLogLevel(entry.level);
@@ -119,13 +119,16 @@ export default function Landing() {
                 );
             }
             if (show) {
-                lines.push(entry.line);
+                const color = getLogLevelColor(level);
+                lines.push({ text: entry.line, color });
                 if (entry.multiline && entry.multiline.length > 0) {
-                    lines.push(...entry.multiline);
+                    entry.multiline.forEach((line) =>
+                        lines.push({ text: line, color })
+                    );
                 }
             }
         });
-        return lines.join("\n");
+        return lines;
     }, [parsedLogLines, categorySettings, fileContent, logLevelsArray]);
 
     // Toggle category enable/disable
@@ -295,31 +298,23 @@ export default function Landing() {
                 </section>
             )}
 
-            <section className="p-4 flex-1 flex flex-col">
+            <section className="p-4 flex-1">
                 {bHasValidFile && (
                     <>
-                        <div className="flex-1 flex flex-col">
-                            <Textarea
-                                value={filteredContent}
-                                readOnly
-                                className="w-full h-full flex flex-col flex-1"
-                                styles={{
-                                    input: {
-                                        fontFamily: "monospace",
-                                        whiteSpace: "pre",
-                                        overflowX: "auto",
-                                        flex: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    },
-                                    wrapper: {
-                                        flex: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    },
-                                }}
-                            />
-                        </div>
+                        <Editor
+                            height={"75vh"} // TODO: figure out how to make this responsive
+                            width={"100%"}
+                            defaultLanguage="plaintext"
+                            value={filteredContent
+                                .map((line) => line.text)
+                                .join("\n")}
+                            options={{
+                                readOnly: true,
+                                fontFamily: "monospace",
+                                wordWrap: "on",
+                                minimap: { enabled: false },
+                            }}
+                        />
                     </>
                 )}
             </section>
