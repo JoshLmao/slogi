@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
     Title,
     Text,
@@ -25,7 +25,14 @@ import { useRouter } from "next/navigation";
 import "../../i18n";
 import Image from "next/image";
 import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
-import Editor from "@monaco-editor/react";
+import dynamic from "next/dynamic";
+import type * as monaco from "monaco-editor";
+import { useMonacoDecorations } from "../utils/useMonacoDecorations";
+
+// Dynamically import Monaco Editor with SSR disabled
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+    ssr: false,
+});
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -207,6 +214,20 @@ export default function Landing() {
         setAppLanguage(currentLocale, i18n);
     }, [i18n, language]);
 
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
+
+    const { applyDecorations } = useMonacoDecorations(editorRef, monacoRef, filteredContent);
+
+    const handleEditorDidMount = (
+        editor: import("monaco-editor").editor.IStandaloneCodeEditor,
+        monaco: typeof import("monaco-editor")
+    ) => {
+        editorRef.current = editor;
+        monacoRef.current = monaco;
+        applyDecorations(); // Ensure decorations are applied immediately after mounting
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
@@ -300,22 +321,21 @@ export default function Landing() {
 
             <section className="p-4 flex-1">
                 {bHasValidFile && (
-                    <>
-                        <Editor
-                            height={"75vh"} // TODO: figure out how to make this responsive
-                            width={"100%"}
-                            defaultLanguage="plaintext"
-                            value={filteredContent
-                                .map((line) => line.text)
-                                .join("\n")}
-                            options={{
-                                readOnly: true,
-                                fontFamily: "monospace",
-                                wordWrap: "on",
-                                minimap: { enabled: false },
-                            }}
-                        />
-                    </>
+                    <MonacoEditor
+                        height="75vh"
+                        width="100%"
+                        defaultLanguage="text"
+                        value={filteredContent
+                            .map((line) => line.text)
+                            .join("\n")}
+                        options={{
+                            readOnly: true,
+                            fontFamily: "monospace",
+                            wordWrap: "on",
+                            minimap: { enabled: false },
+                        }}
+                        onMount={handleEditorDidMount}
+                    />
                 )}
             </section>
 
