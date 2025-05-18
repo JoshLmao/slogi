@@ -27,16 +27,16 @@ body {
 
 /* Define styles for log level colors */
 .log-level-fatal {
-    color: rgb(112, 13, 13) !important;
+    color: rgb(144, 22, 125) !important;
 }
 .log-level-error {
     color: rgb(213, 29, 29) !important;
 }
 .log-level-warning {
-    color: rgb(165, 165, 41) !important;
+    color: rgb(255, 184, 0) !important;
 }
 .log-level-display {
-    color: rgb(190, 120, 50) !important;
+    color: rgb(89, 167, 52) !important;
 }
 .log-level-log {
     color: black !important;

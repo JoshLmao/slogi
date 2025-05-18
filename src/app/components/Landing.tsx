@@ -9,6 +9,7 @@ import {
     FileButton,
     Drawer,
     Select,
+    Paper,
 } from "@mantine/core";
 import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -326,23 +327,25 @@ export default function Landing() {
                 </section>
             )}
 
-            <section className="p-4 flex-1">
+            <section className="flex-1 p-2">
                 {bHasValidFile && (
-                    <MonacoEditor
-                        height="75vh"
-                        width="100%"
-                        defaultLanguage="text"
-                        value={filteredContent
-                            .map((line) => line.text)
-                            .join("\n")}
-                        options={{
-                            readOnly: true,
-                            fontFamily: "monospace",
-                            wordWrap: "on",
-                            minimap: { enabled: false },
-                        }}
-                        onMount={handleEditorDidMount}
-                    />
+                    <Paper radius="md" withBorder p="4">
+                        <MonacoEditor
+                            height="75vh"
+                            width="100%"
+                            defaultLanguage="text"
+                            value={filteredContent
+                                .map((line) => line.text)
+                                .join("\n")}
+                            options={{
+                                readOnly: true,
+                                fontFamily: "monospace",
+                                wordWrap: "on",
+                                minimap: { enabled: false },
+                            }}
+                            onMount={handleEditorDidMount}
+                        />
+                    </Paper>
                 )}
             </section>
 
