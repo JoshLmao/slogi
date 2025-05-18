@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     Title,
     Text,
@@ -26,21 +26,13 @@ import { useRouter } from "next/navigation";
 import "../../i18n";
 import Image from "next/image";
 import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
-import dynamic from "next/dynamic";
-import type * as monaco from "monaco-editor";
-import { useMonacoDecorations } from "../utils/useMonacoDecorations";
-
-// Dynamically import Monaco Editor with SSR disabled
-const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
-    ssr: false,
-});
+import LogConsole from "./LogConsole";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [language, setLanguage] = useState<string>("en");
-    const [editorMountCount, setEditorMountCount] = useState(0);
 
     const router = useRouter();
 
@@ -215,28 +207,6 @@ export default function Landing() {
         setAppLanguage(currentLocale, i18n);
     }, [i18n, language]);
 
-    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
-
-    const { applyDecorations } = useMonacoDecorations(
-        editorRef,
-        monacoRef,
-        filteredContent
-    );
-
-    const handleEditorDidMount = (
-        editor: import("monaco-editor").editor.IStandaloneCodeEditor,
-        monaco: typeof import("monaco-editor")
-    ) => {
-        editorRef.current = editor;
-        monacoRef.current = monaco;
-        setEditorMountCount((prev) => prev + 1); // Increment the mount count so applyDecorations will run on new refs
-    };
-
-    useEffect(() => {
-        applyDecorations();
-    }, [editorMountCount, applyDecorations]);
-
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
@@ -330,21 +300,7 @@ export default function Landing() {
             <section className="flex-1 p-2">
                 {bHasValidFile && (
                     <Paper radius="md" withBorder p="4">
-                        <MonacoEditor
-                            height="75vh"
-                            width="100%"
-                            defaultLanguage="text"
-                            value={filteredContent
-                                .map((line) => line.text)
-                                .join("\n")}
-                            options={{
-                                readOnly: true,
-                                fontFamily: "monospace",
-                                wordWrap: "on",
-                                minimap: { enabled: false },
-                            }}
-                            onMount={handleEditorDidMount}
-                        />
+                        <LogConsole filteredContent={filteredContent} />
                     </Paper>
                 )}
             </section>
