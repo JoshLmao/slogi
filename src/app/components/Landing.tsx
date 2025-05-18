@@ -288,11 +288,10 @@ export default function Landing() {
             {!bHasValidFile && (
                 <section className="w-full max-w-3xl mx-auto flex-none">
                     <Group align="center" justify="center">
-                        <Text className="text-lg">{t("choose_log_file")}</Text>
                         <FileButton onChange={handleFile}>
                             {(props) => (
                                 <Button {...props} variant="outline">
-                                    {t("pick_a_file")}
+                                    {t("choose_a_file")}
                                 </Button>
                             )}
                         </FileButton>
