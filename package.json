@@ -7,7 +7,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "test": "jest"
+        "tests": "jest"
     },
     "dependencies": {
         "@mantine/core": "^8.0.0",
