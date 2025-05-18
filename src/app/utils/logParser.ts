@@ -34,7 +34,7 @@ export function parseLogLines(content: string): ParsedLogEntry[] {
         // If no category, assign "NoLogCategory"
         if (!category) category = "NoLogCategory";
         // If no level, assign "Log"
-        if (!level) level = "Log";
+        if (!level) level = "Warning";
 
         const entry: ParsedLogEntry = { line, category, level };
         entries.push(entry);
