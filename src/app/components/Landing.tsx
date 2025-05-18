@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import {
     Title,
     Text,
@@ -27,7 +27,6 @@ import Image from "next/image";
 import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
 import dynamic from "next/dynamic";
 import type * as monaco from "monaco-editor";
-import { useMonacoDecorations } from "../utils/useMonacoDecorations";
 
 // Dynamically import Monaco Editor with SSR disabled
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
@@ -39,6 +38,7 @@ export default function Landing() {
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [language, setLanguage] = useState<string>("en");
+    const [editorMountCount, setEditorMountCount] = useState(0);
 
     const router = useRouter();
 
@@ -216,20 +216,38 @@ export default function Landing() {
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
 
-    const { applyDecorations } = useMonacoDecorations(
-        editorRef,
-        monacoRef,
-        filteredContent
+    const applyDecorations = useCallback(
+        (
+            editor: monaco.editor.IStandaloneCodeEditor | null,
+            monacoInstance: typeof monaco | null,
+            content: { text: string; level: ELogLevel }[]
+        ) => {
+            if (!editor || !content.length || !monacoInstance) return;
+
+            const newDecorations = content.map((line, index) => ({
+                range: new monacoInstance.Range(index + 1, 1, index + 1, 9999),
+                options: {
+                    inlineClassName: `log-level-${line.level.toLowerCase()}`,
+                },
+            }));
+
+            editor.createDecorationsCollection(newDecorations);
+        },
+        []
     );
 
     const handleEditorDidMount = (
-        editor: import("monaco-editor").editor.IStandaloneCodeEditor,
-        monaco: typeof import("monaco-editor")
+        editor: monaco.editor.IStandaloneCodeEditor,
+        monacoInstance: typeof monaco
     ) => {
         editorRef.current = editor;
-        monacoRef.current = monaco;
-        applyDecorations(); // Ensure decorations are applied immediately after mounting
+        monacoRef.current = monacoInstance;
+        setEditorMountCount((prev) => prev + 1); // Increment the mount count
     };
+
+    useEffect(() => {
+        applyDecorations(editorRef.current, monacoRef.current, filteredContent);
+    }, [editorMountCount, filteredContent, applyDecorations]);
 
     return (
         <div className="min-h-screen flex flex-col">
