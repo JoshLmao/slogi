@@ -1,4 +1,6 @@
+import { LogCategory } from "../types/logCategory";
 import { ParsedLogEntry } from "../types/logEntry";
+import { ELogLevel } from "../types/logLevel";
 
 // Parse log lines to extract category and level, supporting multiline logs and flexible category names
 export function parseLogLines(content: string): ParsedLogEntry[] {
@@ -31,8 +33,8 @@ export function parseLogLines(content: string): ParsedLogEntry[] {
         const levelMatch = rest.match(levelPattern);
         let level = levelMatch ? levelMatch[1] : null;
 
-        // If no category, assign "NoLogCategory"
-        if (!category) category = "NoLogCategory";
+        // If no category, assign NoLogCategory
+        if (!category) category = LogCategory.NoLogCategory;
         // If no level, assign "Log"
         if (!level) level = "Log";
 
@@ -53,7 +55,7 @@ export function parseLogCategories(content: string): Map<string, string> {
         // Remove date/time if present
         const rest = line.replace(dateTimePattern, "");
         const categoryMatch = rest.match(categoryPattern);
-        const category = categoryMatch ? categoryMatch[1] : "NoLogCategory";
+        const category = categoryMatch ? categoryMatch[1] : LogCategory.NoLogCategory;
         if (!categories.has(category)) {
             categories.set(category, category);
         }

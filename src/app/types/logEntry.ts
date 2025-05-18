@@ -1,4 +1,3 @@
-
 export interface ParsedLogEntry {
     line: string;
     category: string;

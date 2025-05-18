@@ -1,5 +1,6 @@
 import { describe } from "node:test";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
+import { LogCategory } from "../types/logCategory";
 
 describe("parseLogLines", () => {
     it("parses a line with no category", () => {
@@ -8,7 +9,7 @@ describe("parseLogLines", () => {
         expect(result).toEqual([
             {
                 line: log,
-                category: "NoLogCategory",
+                category: LogCategory.NoLogCategory,
                 level: "Log",
             },
         ]);
@@ -102,7 +103,7 @@ describe("parseLogLines", () => {
         expect(result).toEqual([
             {
                 line: log,
-                category: "NoLogCategory",
+                category: LogCategory.NoLogCategory,
                 level: "Log",
             },
         ]);
@@ -121,7 +122,7 @@ describe("parseLogCategories", () => {
         expect(Array.from(result.keys())).toEqual([
             "LogA",
             "LogB",
-            "NoLogCategory",
+            LogCategory.NoLogCategory,
             "SourceControl",
         ].sort());
     });
@@ -132,6 +133,6 @@ describe("parseLogCategories", () => {
             "Another line",
         ].join("\n");
         const result = parseLogCategories(log);
-        expect(Array.from(result.keys())).toEqual(["NoLogCategory"]);
+        expect(Array.from(result.keys())).toEqual([LogCategory.NoLogCategory]);
     });
 });
