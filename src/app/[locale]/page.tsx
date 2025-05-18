@@ -1,6 +1,6 @@
 import "@mantine/core/styles.css";
 
-import Landing from "./components/Landing";
+import Landing from "../components/Landing";
 import { ColorSchemeScript, createTheme, MantineProvider } from "@mantine/core";
 import Head from "next/head";
 

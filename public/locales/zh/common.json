@@ -1,0 +1,17 @@
+{
+    "choose_log_file": "选择一个日志文件。",
+    "pick_a_file": "选择一个文件。",
+    "restart": "重新启动。",
+    "options": "选项。",
+    "by_author": "作者：joshlmao",
+    "app_title": "slogi。",
+    "app_subtitle": "一个快速轻量的在线工具，用于排查和分析 Unreal Engine 日志文件。",
+    "log_level_info_title": "日志级别信息。",
+    "log_level_info_desc": "日志是默认的日志级别，适用于所有不包含特定级别的行。",
+    "log_categories": "日志分类。",
+    "filter_categories": "筛选分类...",
+    "clear": "清除",
+    "enable_all": "启用全部。",
+    "disable_all": "禁用全部。",
+    "default_levels": "默认级别。"
+}

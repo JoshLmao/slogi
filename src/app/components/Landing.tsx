@@ -9,6 +9,7 @@ import {
     Group,
     FileButton,
     Drawer,
+    Select,
 } from "@mantine/core";
 import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
@@ -20,11 +21,20 @@ import {
     getCategoryLevelPresence,
 } from "../utils/categorySettings";
 import LogOptionsDrawer from "./LogOptionsDrawer";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import "../../i18n";
+import Image from "next/image";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
+    const [language, setLanguage] = useState<string>("en");
+
+    const router = useRouter();
+
+    const { t, i18n } = useTranslation("common");
 
     const logLevelsArray = Object.values(ELogLevel);
 
@@ -178,6 +188,29 @@ export default function Landing() {
 
     const bHasValidFile = fileContent !== "" && fileContent !== null;
 
+    // Language options for easy expansion
+    const languageOptions = [
+        { value: "en", label: "English" },
+        { value: "zh", label: "简体中文" },
+        { value: "sv", label: "Svenska" },
+        // Add more languages here as needed
+    ];
+
+    const handleLanguageChange = (value: string | null) => {
+        if (value) {
+            setLanguage(value);
+            router.push(`/${value}`);
+        }
+    };
+
+    // Check current locale from url and apply in i18n
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const currentLocale = window.location.pathname.split("/")[1];
+        setLanguage(currentLocale);
+        i18n.changeLanguage(currentLocale);
+    }, [i18n, language]);
+
     return (
         <div className="min-h-screen flex flex-col">
             {/* Thin heading strip */}
@@ -186,26 +219,43 @@ export default function Landing() {
                     <a href="https://joshlmao.com" target="_blank">
                         <Group gap={1}>
                             <Terminal color="darkred" />
-                            by joshlmao
+                            {t("by_author")}
                         </Group>
                     </a>
-                    <a
-                        href="https://github.com/joshlmao/slogi"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <GitHub color="black" />
-                    </a>
+                    <Group gap="md">
+                        <Group gap="xs">
+                            <Image
+                                src="/translate.svg"
+                                alt="Logo"
+                                width={20}
+                                height={20}
+                            />
+                            <Select
+                                data={languageOptions}
+                                value={language}
+                                onChange={handleLanguageChange}
+                                size="xs"
+                                className="w-28"
+                                aria-label="Select language"
+                            />
+                        </Group>
+                        <a
+                            href="https://github.com/joshlmao/slogi"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <GitHub color="black" />
+                        </a>
+                    </Group>
                 </div>
             </div>
 
             <header className="text-center p-4 flex-none">
                 <Title order={1} className="text-4xl sm:text-5xl">
-                    slogi.
+                    {t("app_title")}
                 </Title>
                 <Text className="text-lg sm:text-xl mt-2">
-                    A fast and lightweight online tool for debugging and
-                    analyzing Unreal Engine log files.
+                    {t("app_subtitle")}
                 </Text>
             </header>
 
@@ -213,11 +263,11 @@ export default function Landing() {
             {!bHasValidFile && (
                 <section className="w-full max-w-3xl mx-auto flex-none">
                     <Group align="center" justify="center">
-                        <Text className="text-lg">choose a log file.</Text>
+                        <Text className="text-lg">{t("choose_log_file")}</Text>
                         <FileButton onChange={handleFile}>
                             {(props) => (
                                 <Button {...props} variant="outline">
-                                    pick a file.
+                                    {t("pick_a_file")}
                                 </Button>
                             )}
                         </FileButton>
@@ -240,13 +290,13 @@ export default function Landing() {
                             className="text-center"
                         >
                             <RotateCcw color="white" className="mr-2" />
-                            restart.
+                            {t("restart")}
                         </Button>
                     </div>
                     <div className="ml-auto">
                         <Button onClick={open}>
                             <Sliders color="white" className="mr-2" />
-                            options.
+                            {t("options")}
                         </Button>
                     </div>
                 </section>
@@ -285,7 +335,7 @@ export default function Landing() {
                 position="right"
                 opened={opened}
                 onClose={close}
-                title="options."
+                title={t("options")}
             >
                 {/* Log Categories */}
                 <LogOptionsDrawer
