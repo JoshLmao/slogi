@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import type * as monaco from "monaco-editor";
 import { ELogLevel } from "../types/logLevel";
 
@@ -12,8 +12,6 @@ export function useMonacoDecorations(
     monacoRef: React.MutableRefObject<typeof monaco | null>,
     content: DecorationData[]
 ) {
-    const decorationsCollectionRef = useRef<monaco.editor.IEditorDecorationsCollection | null>(null);
-
     const applyDecorations = useCallback(() => {
         const editor = editorRef.current;
         if (!editor || !content.length || !monacoRef.current) return;
@@ -25,11 +23,7 @@ export function useMonacoDecorations(
             },
         }));
 
-        if (!decorationsCollectionRef.current) {
-            decorationsCollectionRef.current = editor.createDecorationsCollection(newDecorations);
-        } else {
-            decorationsCollectionRef.current.set(newDecorations);
-        }
+        editor.createDecorationsCollection(newDecorations);
     }, [content, editorRef, monacoRef]);
 
     useEffect(() => {

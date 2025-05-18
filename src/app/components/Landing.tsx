@@ -39,6 +39,7 @@ export default function Landing() {
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [language, setLanguage] = useState<string>("en");
+    const [editorMountCount, setEditorMountCount] = useState(0);
 
     const router = useRouter();
 
@@ -228,8 +229,12 @@ export default function Landing() {
     ) => {
         editorRef.current = editor;
         monacoRef.current = monaco;
-        applyDecorations(); // Ensure decorations are applied immediately after mounting
+        setEditorMountCount((prev) => prev + 1); // Increment the mount count so applyDecorations will run on new refs
     };
+
+    useEffect(() => {
+        applyDecorations();
+    }, [editorMountCount, applyDecorations]);
 
     return (
         <div className="min-h-screen flex flex-col">
