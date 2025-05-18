@@ -8,10 +8,9 @@ import {
     Group,
     FileButton,
     Drawer,
-    Select,
     Paper,
 } from "@mantine/core";
-import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
+import { RotateCcw, Sliders } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
 import { ELogLevel, parseLogLevel } from "../types/logLevel";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
@@ -24,9 +23,9 @@ import LogOptionsDrawer from "./LogOptionsDrawer";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import "../../i18n";
-import Image from "next/image";
-import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
 import LogConsole from "./LogConsole";
+import HeadingStrip from "./HeadingStrip";
+import { setAppLanguage } from "../utils/languageUtils";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -209,42 +208,7 @@ export default function Landing() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Thin heading strip */}
-            <div className="bg-gray-100">
-                <div className="p-2 flex justify-between items-center gap-4 mx-auto max-w-screen-lg">
-                    <a href="https://joshlmao.com" target="_blank">
-                        <Group gap={1}>
-                            <Terminal color="darkred" />
-                            {t("by_author")}
-                        </Group>
-                    </a>
-                    <Group gap="md">
-                        <Group gap="xs">
-                            <Image
-                                src="/translate.svg"
-                                alt="Logo"
-                                width={20}
-                                height={20}
-                            />
-                            <Select
-                                data={getSupportedLanguages()}
-                                value={language}
-                                onChange={handleLanguageChange}
-                                size="xs"
-                                className="w-28"
-                                aria-label="Select language"
-                            />
-                        </Group>
-                        <a
-                            href="https://github.com/joshlmao/slogi"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <GitHub color="black" />
-                        </a>
-                    </Group>
-                </div>
-            </div>
+            <HeadingStrip language={language} onLanguageChange={handleLanguageChange} />
 
             <header className="text-center p-4 flex-none">
                 <Title order={1} className="text-4xl sm:text-5xl">
