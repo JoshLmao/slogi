@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# sLogi
 
-## Getting Started
+<table>
+    <tr>
+        <td>
+            <img src="public/slogi-icon.png" height="75" alt="sLogi Icon"/>
+        </td>
+        <td style="vertical-align: middle; padding-left: 16px;">
+            <a href="https://slogi.joshlmao.com">slogi.joshlmao.com</a>
+        </td>
+    </tr>
+</table>
 
-First, run the development server:
+A fast and lightweight online tool for debugging and analyzing Unreal Engine log files.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Development
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A next.js v15 app, built using the App router approach.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repo
+2. `npm install`
+3. `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Tests
 
-## Learn More
+Tests can be run using `npm run tests` and verify the core functionality of the app. Can be found under the `/src/app/tests/`
 
-To learn more about Next.js, take a look at the following resources:
+# Localization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app can be localized and supports expanding to new languages. Locale files can be found as json files under `/public/locales/`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Adding a new locale
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Create a new json file with the translated phrases.
+2. Add the locale code and localized label inside `languageUtils.ts`, `getSupportedLanguages()`
