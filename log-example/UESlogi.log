@@ -1,0 +1,27 @@
+LogSlogiDebug: Fatal: Example fatal line in the log
+LogSlogiDebug: Fatal: Example fatal line in the log
+LogSlogiDebug: Fatal: Example fatal line in the log
+LogSlogiDebug: Fatal: Example fatal line in the log
+LogSlogiDebug: Error: An error has occured that can cause some issues
+LogSlogiDebug: Error: An error has occured that can cause some issues
+LogSlogiDebug: Error: An error has occured that can cause some issues
+LogSlogiDebug: Error: An error has occured that can cause some issues
+LogSlogiDebug: Warning: Some warning has happened
+LogSlogiDebug: Warning: Some warning has happened
+LogSlogiDebug: Warning: Some warning has happened
+LogSlogiDebug: Warning: Some warning has happened
+LogSlogiDebug: Display: Showing you some display text
+LogSlogiDebug: Display: Showing you some display text
+LogSlogiDebug: Display: Showing you some display text
+LogSlogiDebug: Display: Showing you some display text
+LogSlogiDebug: Log: A regular log with the level supplied
+LogSlogiDebug: Log: A regular log with the level supplied
+LogSlogiDebug: A normal log without a category supplied.
+LogSlogiDebug: A normal log without a category supplied.
+LogSlogiDebug: Verbose: Some extra verbose information about the game
+LogSlogiDebug: Verbose: Some extra verbose information about the game
+LogSlogiDebug: Verbose: Some extra verbose information about the game
+LogSlogiDebug: VeryVerbose: So detailed explanation about some things
+LogSlogiDebug: VeryVerbose: So detailed explanation about some things
+LogSlogiDebug: VeryVerbose: So detailed explanation about some things
+LogSlogiDebug: VeryVerbose: So detailed explanation about some things

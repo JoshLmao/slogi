@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
     Title,
     Text,
     Button,
-    Textarea,
     Group,
     FileButton,
     Drawer,
@@ -26,12 +25,21 @@ import { useRouter } from "next/navigation";
 import "../../i18n";
 import Image from "next/image";
 import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
+import dynamic from "next/dynamic";
+import type * as monaco from "monaco-editor";
+import { useMonacoDecorations } from "../utils/useMonacoDecorations";
+
+// Dynamically import Monaco Editor with SSR disabled
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+    ssr: false,
+});
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
     const [language, setLanguage] = useState<string>("en");
+    const [editorMountCount, setEditorMountCount] = useState(0);
 
     const router = useRouter();
 
@@ -98,8 +106,8 @@ export default function Landing() {
         };
 
         if (!fileContent || Object.keys(categorySettings).length === 0)
-            return "";
-        const lines: string[] = [];
+            return [];
+        const lines: { text: string; level: ELogLevel }[] = [];
         parsedLogLines.forEach((entry) => {
             const cat = entry.category;
             const level: ELogLevel = parseLogLevel(entry.level);
@@ -119,13 +127,15 @@ export default function Landing() {
                 );
             }
             if (show) {
-                lines.push(entry.line);
+                lines.push({ text: entry.line, level });
                 if (entry.multiline && entry.multiline.length > 0) {
-                    lines.push(...entry.multiline);
+                    entry.multiline.forEach((line) =>
+                        lines.push({ text: line, level })
+                    );
                 }
             }
         });
-        return lines.join("\n");
+        return lines;
     }, [parsedLogLines, categorySettings, fileContent, logLevelsArray]);
 
     // Toggle category enable/disable
@@ -203,6 +213,28 @@ export default function Landing() {
         setLanguage(currentLocale);
         setAppLanguage(currentLocale, i18n);
     }, [i18n, language]);
+
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
+
+    const { applyDecorations } = useMonacoDecorations(
+        editorRef,
+        monacoRef,
+        filteredContent
+    );
+
+    const handleEditorDidMount = (
+        editor: import("monaco-editor").editor.IStandaloneCodeEditor,
+        monaco: typeof import("monaco-editor")
+    ) => {
+        editorRef.current = editor;
+        monacoRef.current = monaco;
+        setEditorMountCount((prev) => prev + 1); // Increment the mount count so applyDecorations will run on new refs
+    };
+
+    useEffect(() => {
+        applyDecorations();
+    }, [editorMountCount, applyDecorations]);
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -295,32 +327,23 @@ export default function Landing() {
                 </section>
             )}
 
-            <section className="p-4 flex-1 flex flex-col">
+            <section className="p-4 flex-1">
                 {bHasValidFile && (
-                    <>
-                        <div className="flex-1 flex flex-col">
-                            <Textarea
-                                value={filteredContent}
-                                readOnly
-                                className="w-full h-full flex flex-col flex-1"
-                                styles={{
-                                    input: {
-                                        fontFamily: "monospace",
-                                        whiteSpace: "pre",
-                                        overflowX: "auto",
-                                        flex: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    },
-                                    wrapper: {
-                                        flex: 1,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    },
-                                }}
-                            />
-                        </div>
-                    </>
+                    <MonacoEditor
+                        height="75vh"
+                        width="100%"
+                        defaultLanguage="text"
+                        value={filteredContent
+                            .map((line) => line.text)
+                            .join("\n")}
+                        options={{
+                            readOnly: true,
+                            fontFamily: "monospace",
+                            wordWrap: "on",
+                            minimap: { enabled: false },
+                        }}
+                        onMount={handleEditorDidMount}
+                    />
                 )}
             </section>
 

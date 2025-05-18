@@ -12,7 +12,9 @@
     "dependencies": {
         "@mantine/core": "^8.0.0",
         "@mantine/hooks": "^8.0.0",
+        "@monaco-editor/react": "^4.7.0",
         "feather-icons": "^4.29.2",
+        "monaco-editor": "^0.52.2",
         "next": "15.3.2",
         "next-i18next": "^15.4.2",
         "react": "^19.0.0",
