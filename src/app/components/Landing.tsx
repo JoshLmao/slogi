@@ -25,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import "../../i18n";
 import Image from "next/image";
+import { getSupportedLanguages, setAppLanguage } from "../utils/languageUtils";
 
 export default function Landing() {
     const [fileContent, setFileContent] = useState<string | null>(null);
@@ -188,14 +189,6 @@ export default function Landing() {
 
     const bHasValidFile = fileContent !== "" && fileContent !== null;
 
-    // Language options for easy expansion
-    const languageOptions = [
-        { value: "en", label: "English" },
-        { value: "zh", label: "简体中文" },
-        { value: "sv", label: "Svenska" },
-        // Add more languages here as needed
-    ];
-
     const handleLanguageChange = (value: string | null) => {
         if (value) {
             setLanguage(value);
@@ -208,7 +201,7 @@ export default function Landing() {
         if (typeof window === "undefined") return;
         const currentLocale = window.location.pathname.split("/")[1];
         setLanguage(currentLocale);
-        i18n.changeLanguage(currentLocale);
+        setAppLanguage(currentLocale, i18n);
     }, [i18n, language]);
 
     return (
@@ -231,7 +224,7 @@ export default function Landing() {
                                 height={20}
                             />
                             <Select
-                                data={languageOptions}
+                                data={getSupportedLanguages()}
                                 value={language}
                                 onChange={handleLanguageChange}
                                 size="xs"
