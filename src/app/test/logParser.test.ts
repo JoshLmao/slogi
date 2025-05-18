@@ -1,6 +1,7 @@
 import { describe } from "node:test";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
 import { LogCategory } from "../types/logCategory";
+import { ELogLevel } from "../types/logLevel";
 
 describe("parseLogLines", () => {
     it("parses a line with no category", () => {
@@ -10,7 +11,7 @@ describe("parseLogLines", () => {
             {
                 line: log,
                 category: LogCategory.NoLogCategory,
-                level: "Log",
+                level: ELogLevel.Log,
             },
         ]);
     });
@@ -22,7 +23,7 @@ describe("parseLogLines", () => {
             {
                 line: log,
                 category: "SourceControl",
-                level: "Log",
+                level: ELogLevel.Log,
             },
         ]);
     });
@@ -63,7 +64,7 @@ describe("parseLogLines", () => {
             {
                 line: "[2025.01.15-18.39.28:852][  0]LogConsoleResponse: User settings details:",
                 category: "LogConsoleResponse",
-                level: "Log",
+                level: ELogLevel.Log,
                 multiline: [
                     "- Resolution: 0x0@120.0Hz at 0.0% 3D Resolution",
                     "- Fullscreen mode: WindowedFullscreen, VSync: 0",
@@ -84,7 +85,7 @@ describe("parseLogLines", () => {
             {
                 line: "[2025.01.15-18.39.28:852][  0]LogConsoleResponse: User settings details:",
                 category: "LogConsoleResponse",
-                level: "Log",
+                level: ELogLevel.Log,
                 multiline: [
                     "- Resolution: 0x0@120.0Hz at 0.0% 3D Resolution",
                 ],
@@ -92,7 +93,7 @@ describe("parseLogLines", () => {
             {
                 line: "[2025.01.15-18.39.29:000][  0]SourceControl: Revision control is disabled",
                 category: "SourceControl",
-                level: "Log",
+                level: ELogLevel.Log,
             },
         ]);
     });
@@ -104,7 +105,7 @@ describe("parseLogLines", () => {
             {
                 line: log,
                 category: LogCategory.NoLogCategory,
-                level: "Log",
+                level: ELogLevel.Log,
             },
         ]);
     });

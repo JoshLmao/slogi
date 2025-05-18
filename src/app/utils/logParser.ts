@@ -36,7 +36,8 @@ export function parseLogLines(content: string): ParsedLogEntry[] {
         // If no category, assign NoLogCategory
         if (!category) category = LogCategory.NoLogCategory;
         // If no level, assign "Log"
-        if (!level) level = "Log";
+        if (!level) level = ELogLevel.Log;
+        // fix tests but need some change to test pr
 
         const entry: ParsedLogEntry = { line, category, level };
         entries.push(entry);
