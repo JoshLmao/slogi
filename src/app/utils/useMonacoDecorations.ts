@@ -1,9 +1,10 @@
 import { useEffect, useRef, useCallback } from "react";
 import type * as monaco from "monaco-editor";
+import { ELogLevel } from "../types/logLevel";
 
 interface DecorationData {
     text: string;
-    color: string;
+    level: ELogLevel;
 }
 
 export function useMonacoDecorations(
@@ -20,7 +21,7 @@ export function useMonacoDecorations(
         const newDecorations = content.map((line, index) => ({
             range: new monacoRef.current!.Range(index + 1, 1, index + 1, 9999),
             options: {
-                inlineClassName: `log-level-${line.color}`,
+                inlineClassName: `log-level-${line.level.toLowerCase()}`,
             },
         }));
 

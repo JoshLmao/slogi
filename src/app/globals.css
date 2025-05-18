@@ -26,30 +26,24 @@ body {
 }
 
 /* Define styles for log level colors */
-.log-level-darkred {
-    color: darkred !important;
+.log-level-fatal {
+    color: rgb(112, 13, 13) !important;
 }
-.log-level-red {
-    color: red !important;
+.log-level-error {
+    color: rgb(213, 29, 29) !important;
 }
-.log-level-yellow {
-    color: yellow !important;
+.log-level-warning {
+    color: rgb(165, 165, 41) !important;
 }
-.log-level-orange {
-    color: orange !important;
+.log-level-display {
+    color: rgb(190, 120, 50) !important;
 }
-.log-level-black {
+.log-level-log {
     color: black !important;
 }
-.log-level-blue {
-    color: blue !important;
+.log-level-verbose {
+    color: rgb(58, 67, 170) !important;
 }
-.log-level-lightblue {
-    color: lightblue !important;
-}
-.monaco-editor .line-error {
-    color: rgba(255, 0, 0, 0.2) !important;
-}
-.monaco-editor .line-success {
-    color: rgba(0, 255, 0, 0.2) !important;
+.log-level-veryverbose {
+    color: rgb(58, 108, 170) !important;
 }

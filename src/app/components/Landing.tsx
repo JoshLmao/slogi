@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { GitHub, RotateCcw, Sliders, Terminal } from "react-feather";
 import { useDisclosure } from "@mantine/hooks";
-import { ELogLevel, parseLogLevel, getLogLevelColor } from "../types/logLevel";
+import { ELogLevel, parseLogLevel } from "../types/logLevel";
 import { parseLogLines, parseLogCategories } from "../utils/logParser";
 import { handleFileParsing } from "../utils/fileParser";
 import {
@@ -106,7 +106,7 @@ export default function Landing() {
 
         if (!fileContent || Object.keys(categorySettings).length === 0)
             return [];
-        const lines: { text: string; color: string }[] = [];
+        const lines: { text: string; level: ELogLevel }[] = [];
         parsedLogLines.forEach((entry) => {
             const cat = entry.category;
             const level: ELogLevel = parseLogLevel(entry.level);
@@ -126,11 +126,10 @@ export default function Landing() {
                 );
             }
             if (show) {
-                const color = getLogLevelColor(level);
-                lines.push({ text: entry.line, color });
+                lines.push({ text: entry.line, level });
                 if (entry.multiline && entry.multiline.length > 0) {
                     entry.multiline.forEach((line) =>
-                        lines.push({ text: line, color })
+                        lines.push({ text: line, level })
                     );
                 }
             }
@@ -217,7 +216,11 @@ export default function Landing() {
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = useRef<typeof import("monaco-editor") | null>(null);
 
-    const { applyDecorations } = useMonacoDecorations(editorRef, monacoRef, filteredContent);
+    const { applyDecorations } = useMonacoDecorations(
+        editorRef,
+        monacoRef,
+        filteredContent
+    );
 
     const handleEditorDidMount = (
         editor: import("monaco-editor").editor.IStandaloneCodeEditor,
